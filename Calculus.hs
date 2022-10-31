@@ -1,7 +1,6 @@
 module Calculus where
 
 import Data.Maybe
-import Data.List
 
 data UnOp = Neg | Sin | Cos | Log
           deriving (Eq, Ord, Show)
