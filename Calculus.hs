@@ -39,6 +39,7 @@ instance Num Exp where
   signum      = undefined
   abs         = undefined
 
+
 instance Fractional Exp where
   fromRational = Val . fromRational
   (/)          = BinApp Div
@@ -137,7 +138,7 @@ maclaurin exp x n
   = sum (zipWith3 (\x y z -> (x * z) / y) series facts xs)
   where
     series = map (`eval` [("x", 0.0)]) (take n (iterate (`diff` "x") exp))
-    facts = 1 : take n (scanl (*) 1 [2..])
+    facts = 1 : scanl (*) 1 [2..]
     xs = take n (iterate (* x) 1)
 -- take n $ iterate (diff exp) var
 ---------------------------------------------------------------------------
