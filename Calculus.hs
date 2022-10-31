@@ -32,8 +32,14 @@ instance Vars Double where
 instance Num Exp where
   fromInteger = Val . fromInteger
   negate      = UnApp Neg
-  (+)         = BinApp Add
-  (*)         = BinApp Mul
+  (+) 0 y     = y
+  (+) x 0     = x
+  (+) x y     = BinApp Add x y
+  (*) x 0     = 0
+  (*) 0 y     = 0
+  (*) x 1     = x
+  (*) 1 y     = y
+  (*) x y     = BinApp Mul x y
 -- Leave the following two undefined...
   signum      = undefined
   abs         = undefined
