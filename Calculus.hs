@@ -33,7 +33,21 @@ instance Num Exp where
   fromInteger = Val . fromInteger
   negate      = UnApp Neg
   (+)         = BinApp Add
+  {-
+  uncomment the following to calculate high order maclaurin series
+  (+) x y = BinApp Add x y
+  (+) x 0 = x
+  (+) 0 y = y
+  -}
   (*)         = BinApp Mul
+  {-
+  uncomment the following to calculate high order maclaurin series
+  (*) x y = BinApp Mul x y
+  (*) x 0 = 0
+  (*) 0 y = 0
+  (*) x 1 = x
+  (*) 1 y = y
+  -}
 -- Leave the following two undefined...
   signum      = undefined
   abs         = undefined
@@ -42,6 +56,13 @@ instance Num Exp where
 instance Fractional Exp where
   fromRational = Val . fromRational
   (/)          = BinApp Div
+  {-
+  uncomment the following to calculate high order maclaurin series
+  (/) x y = Bin App Div x y
+  (/) x 1 = x
+  (/) 0 y = Val 0
+  -}
+
 -- Leave the following one undefined...
   recip        = undefined
 
@@ -69,8 +90,10 @@ instance Floating Exp where
 ---------------------------------------------------------------------------
 
 -- pre: binding must be in environment
+-- finds corresponding value for input variable
 lookUp :: Eq a => a -> [(a, b)] -> b
 lookUp variable environment = fromJust(lookup variable environment)
+
 
 unTo :: UnOp -> String
 unTo Neg = "-"
@@ -103,6 +126,7 @@ unOps = [
   (Log, log)
   ]
 
+-- evaluates a given expression
 eval :: Exp -> Env -> Double
 eval (Val x) _           = x
 eval (Id x) env          = lookUp x env
@@ -110,6 +134,7 @@ eval (BinApp op x y) env = lookUp op binOps (eval x env) (eval y env)
 eval (UnApp op x) env    = lookUp op unOps (eval x env)
 
 
+-- finds the first derivative of a given expression
 diff :: Exp -> String -> Exp
 diff (Val x) _ = 0
 diff (Id x) var
@@ -132,6 +157,7 @@ diff (UnApp op exp) var
   where
     chain = diff exp var
 
+-- calculates the sum of maclaurin series at a given order
 maclaurin :: Exp -> Double -> Int -> Double
 maclaurin exp x n
   = sum (zipWith3 (\x y z -> (x * z) / y) series facts xs)
@@ -139,7 +165,7 @@ maclaurin exp x n
     series = map (`eval` [("x", 0.0)]) (take n (iterate (`diff` "x") exp))
     facts = 1 : scanl (*) 1 [2..]
     xs = take n (iterate (* x) 1)
--- take n $ iterate (diff exp) var
+
 ---------------------------------------------------------------------------
 -- Test cases...
 
